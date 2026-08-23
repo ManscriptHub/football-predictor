@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Johnson's Hub - Test</title>
+    <style>
+        body { font-family: Arial; background: #0a0e17; color: white; text-align: center; padding: 40px; }
+        button { padding: 15px 30px; font-size: 20px; background: #00d4ff; border: none; border-radius: 10px; color: black; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .card { background: #1a2a3a; padding: 20px; border-radius: 10px; max-width: 400px; margin: 20px auto; }
+        .click-test { background: #7b2ffc; padding: 15px; border-radius: 10px; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>⚡ JOHNSON'S HUB</h1>
+    <p>TEST PAGE - Is this loading?</p>
+    
+    <div class="card">
+        <p>If you can see this, the HTML is working!</p>
+        <button onclick="alert('✅ Button clicked! JavaScript is alive!')">Click Me To Test JS</button>
+        <div class="click-test" onclick="alert('✅ Div clicked!')">Click this div too</div>
+    </div>
+
+    <p style="color: #8899aa; margin-top: 40px;">If the buttons above give an alert, your site is functioning.</p>
+
+    <script>
+        console.log("✅ JavaScript is running!");
+        document.body.style.border = "3px solid #00ff88";
+    </script>
+
+</body>
+</html>
