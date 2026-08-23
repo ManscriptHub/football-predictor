@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Johnson's Hub - Football Edge AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <div>
+                    <h2>JOHNSON'S</h2>
+                    <h2>HUB</h2>
+                </div>
+            </div>
+            <div class="brand-tag">FOOTBALL EDGE AI</div>
+            <div class="date-picker">
+                <label>📅 SELECT DATE</label>
+                <input type="date" value="2025-08-22">
+            </div>
+            <div class="leagues-section">
+                <h4>ALL LEAGUES</h4>
+                <ul class="league-list">
+                    <li class="active">🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENGLAND</li>
+                    <li>🇪🇸 SPAIN</li>
+                    <li>🇮🇹 ITALY</li>
+                    <li>🇩🇪 GERMANY</li>
+                    <li>🇫🇷 FRANCE</li>
+                    <li>🇳🇱 NETHERLANDS</li>
+                    <li>🇵🇹 PORTUGAL</li>
+                    <li class="more">MORE ▼</li>
+                </ul>
+            </div>
+            <nav class="nav-menu">
+                <h4>TOP LEAGUES</h4>
+                <ul>
+                    <li class="active">⭐ My Favourites</li>
+                    <li>🤖 AI Predictions</li>
+                    <li>💰 Bankroll Manager</li>
+                    <li>📊 Stats & Insights</li>
+                    <li>📜 Bet History</li>
+                    <li>⚙️ Settings</li>
+                    <li>❓ Help Center</li>
+                    <li class="logout">🚪 Logout</li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                    <h1>BETTER SMARTER NOT HARDER</h1>
+                    <p>Let the data lead, you follow the profit!</p>
+                </div>
+                <div class="header-right">
+                    <div class="scan-status">
+                        <span class="dot"></span>
+                        Last scanned: 22 Aug 2025, 10:25 AM
+                    </div>
+                    <div class="ai-badge">FOOTBALL EDGE AI</div>
+                </div>
+            </header>
+            <div class="league-filter-bar">
+                <span>🏆 ENGLAND: PREMIER LEAGUE</span>
+                <div class="filter-tabs">
+                    <button class="active">All Matches</button>
+                    <button>Live</button>
+                    <button>Upcoming</button>
+                    <button>Finished</button>
+                </div>
+                <button class="refresh-btn">🔄 Refresh</button>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="odds-label">BOOKMAKER ODDS</div>
+                    <div class="odds-columns">
+                        <span>1</span><span>X</span><span>2</span>
+                        <span>GG</span><span>O2.5</span>
+                        <span>1</span><span>X</span><span>2</span>
+                        <span>GG</span><span>O2.5</span>
+                        <span class="best-edge">BEST EDGE</span>
+                    </div>
+                </div>
+                <div class="table-row header-row">
+                    <span>TIME</span>
+                    <span class="match-col">MATCH</span>
+                    <span>1</span><span>X</span><span>2</span>
+                    <span>GG</span><span>O2.5</span>
+                    <span>1</span><span>X</span><span>2</span>
+                    <span>GG</span><span>O2.5</span>
+                    <span class="best-edge">%</span>
+                </div>
+                <div class="match-row" data-prediction="home">
+                    <span class="time">12:30</span>
+                    <span class="match-col"><strong>Arsenal</strong> vs Chelsea</span>
+                    <span>1.85</span><span>3.60</span><span>4.20</span>
+                    <span>1.72</span><span>1.90</span>
+                    <span>54%</span><span>25%</span><span>21%</span>
+                    <span>61%</span><span>58%</span>
+                    <span class="best-edge highlight">18%</span>
+                </div>
+                <div class="match-row" data-prediction="home">
+                    <span class="time">15:00</span>
+                    <span class="match-col"><strong>Liverpool</strong> vs Bournemouth</span>
+                    <span>1.44</span><span>4.80</span><span>6.80</span>
+                    <span>1.60</span><span>1.75</span>
+                    <span>68%</span><span>20%</span><span>12%</span>
+                    <span>57%</span><span>62%</span>
+                    <span class="best-edge highlight">8%</span>
+                </div>
+                <div class="match-row" data-prediction="home">
+                    <span class="time">15:00</span>
+                    <span class="match-col"><strong>Man City</strong> vs Newcastle</span>
+                    <span>1.58</span><span>4.30</span><span>5.60</span>
+                    <span>1.70</span><span>1.83</span>
+                    <span>62%</span><span>22%</span><span>16%</span>
+                    <span>63%</span><span>59%</span>
+                    <span class="best-edge highlight">6%</span>
+                </div>
+                <div class="match-row" data-prediction="draw">
+                    <span class="time">15:00</span>
+                    <span class="match-col"><strong>Aston Villa</strong> vs Everton</span>
+                    <span>2.05</span><span>3.40</span><span>3.80</span>
+                    <span>1.85</span><span>2.05</span>
+                    <span>47%</span><span>26%</span><span>27%</span>
+                    <span>54%</span><span>51%</span>
+                    <span class="best-edge highlight">45%</span>
+                </div>
+                <div class="match-row" data-prediction="away">
+                    <span class="time">17:30</span>
+                    <span class="match-col"><strong>Tottenham</strong> vs Man Utd</span>
+                    <span>1.95</span><span>3.70</span><span>4.10</span>
+                    <span>1.78</span><span>1.92</span>
+                    <span>51%</span><span>24%</span><span>25%</span>
+                    <span>60%</span><span>57%</span>
+                    <span class="best-edge highlight">30%</span>
+                </div>
+            </div>
+            <div class="ai-prediction-bar">
+                <span class="ai-label">🤖 AI PREDICTION</span>
+                <div class="ai-picks">
+                    <span class="pick home">🏠 HOME</span>
+                    <span class="pick home">🏠 HOME</span>
+                    <span class="pick home">🏠 HOME</span>
+                    <span class="pick draw">⚖️ DRAW</span>
+                    <span class="pick away">✈️ AWAY</span>
+                </div>
+            </div>
+            <div class="bottom-stats">
+                <div class="stat-card">
+                    <h4>🏟️ TON OF PLAYERS</h4>
+                    <div class="stat-bars">
+                        <div class="stat-bar">
+                            <span>1X2</span>
+                            <div class="bar"><div style="width:45%;background:#00d4ff;"></div></div>
+                            <span>45%</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span>Over 2.5</span>
+                            <div class="bar"><div style="width:30%;background:#7b2ffc;"></div></div>
+                            <span>30%</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span>BTTS (GG)</span>
+                            <div class="bar"><div style="width:15%;background:#ffd700;"></div></div>
+                            <span>15%</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span>Others</span>
+                            <div class="bar"><div style="width:10%;background:#ff6b6b;"></div></div>
+                            <span>10%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card bankroll">
+                    <h4>💰 BANKROLL OVERVIEW</h4>
+                    <div class="bankroll-stats">
+                        <div>
+                            <span class="label">Total Bankroll</span>
+                            <span class="value">$1,250.00</span>
+                        </div>
+                        <div>
+                            <span class="label">Today's P/L</span>
+                            <span class="value positive">+$86.40</span>
+                        </div>
+                        <div>
+                            <span class="label">ROI</span>
+                            <span class="value positive">+6.91%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
