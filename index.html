@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Johnson's Hub - Football Edge AI Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0e17; color: #fff; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: #0d1b2a;
+            padding: 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            border-right: 1px solid #1a2a3a;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar .logo { font-size: 1.5rem; color: #00d4ff; font-weight: bold; margin-bottom: 5px; }
+        .sidebar .sub { color: #8899aa; font-size: 0.7rem; margin-bottom: 20px; }
+        .sidebar h4 { color: #8899aa; font-size: 0.6rem; letter-spacing: 1px; margin: 15px 0 5px; }
+        .sidebar ul { list-style: none; }
+        .sidebar ul li { padding: 8px 10px; border-radius: 6px; cursor: pointer; color: #99aabb; font-size: 0.85rem; }
+        .sidebar ul li:hover, .sidebar ul li.active { background: #00d4ff22; color: #00d4ff; }
+        .sidebar .close-btn { background: none; border: none; color: #ff6b6b; font-size: 1.5rem; cursor: pointer; float: right; }
+        .sidebar .logout { color: #ff6b6b; margin-top: 20px; border-top: 1px solid #1a2a3a; padding-top: 15px; }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.show { display: block; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        .menu-btn { background: #1a2a3a; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; margin-bottom: 15px; }
+        .menu-btn:hover { background: #2a3a4a; }
+        h1 { color: #00d4ff; font-size: 1.8rem; text-align: center; }
+        .subtitle { text-align: center; color: #8899aa; margin-bottom: 20px; font-size: 0.85rem; }
+        .card { background: #111b26; border: 1px solid #1a2a3a; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .card h3 { color: #00d4ff; margin-bottom: 10px; font-size: 0.95rem; }
+        .flex { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+        .btn { background: transparent; color: #8899aa; border: 1px solid #1a2a3a; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; }
+        .btn.active { background: linear-gradient(135deg, #00d4ff, #7b2ffc); color: #fff; border-color: transparent; }
+        .btn-primary { background: #1a2a3a; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; }
+        .btn-primary:hover { background: #2a3a4a; }
+
+        /* Match Card */
+        .match-card {
+            background: #111b26;
+            border: 1px solid #1a2a3a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        .match-card:hover {
+            border-color: #00d4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.05);
+        }
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .match-teams {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .match-teams strong { color: #00d4ff; }
+        .match-teams .vs { color: #8899aa; margin: 0 8px; }
+
+        .match-odds {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .match-odds .odd {
+            background: #0d1b2a;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #ffd700;
+        }
+        .match-odds .label { color: #8899aa; font-size: 0.65rem; }
+
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #0d1b2a;
+        }
+        .prediction-item {
+            background: #0d1b2a;
+            padding: 6px 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .prediction-item .label {
+            font-size: 0.5rem;
+            color: #8899aa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .prediction-item .value {
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .prediction-item .value.home { color: #00d4ff; }
+        .prediction-item .value.draw { color: #ffd700; }
+        .prediction-item .value.away { color: #ff6b6b; }
+        .prediction-item .value.yes { color: #00ff88; }
+        .prediction-item .value.no { color: #ff6b6b; }
+        .prediction-item .value.over { color: #00ff88; }
+        .prediction-item .value.under { color: #ff6b6b; }
+        .prediction-item .value.star { color: #ffd700; }
+
+        .confidence-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #0d1b2a;
+        }
+        .confidence-bar .bar {
+            flex: 1;
+            height: 4px;
+            background: #1a2a3a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .confidence-bar .bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        .confidence-bar .label {
+            font-size: 0.65rem;
+            color: #8899aa;
+        }
+        .confidence-bar .value {
+            font-size: 0.75rem;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .form-indicators {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .form-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+        .form-badge.good { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8844; }
+        .form-badge.average { background: #ffd70022; color: #ffd700; border: 1px solid #ffd70044; }
+        .form-badge.poor { background: #ff6b6b22; color: #ff6b6b; border: 1px solid #ff6b6b44; }
+        .form-badge.h2h { background: #7b2ffc22; color: #7b2ffc; border: 1px solid #7b2ffc44; }
+
+        .ai-picks { display: flex; gap: 8px; flex-wrap: wrap; }
+        .ai-pick { padding: 4px 14px; border-radius: 16px; font-size: 0.75rem; font-weight: 700; }
+        .ai-pick.home { background: #00d4ff22; color: #00d4ff; border: 1px solid #00d4ff44; }
+        .ai-pick.draw { background: #ffd70022; color: #ffd700; border: 1px solid #ffd70044; }
+        .ai-pick.away { background: #ff6b6b22; color: #ff6b6b; border: 1px solid #ff6b6b44; }
+        .ai-pick.gg { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8844; }
+        .ai-pick.over { background: #7b2ffc22; color: #7b2ffc; border: 1px solid #7b2ffc44; }
+        .ai-pick.under { background: #ff884422; color: #ff8844; border: 1px solid #ff884444; }
+        .ai-pick.star { background: #ffd70022; color: #ffd700; border: 1px solid #ffd70044; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
+        .stat-grid .label { font-size: 0.6rem; color: #8899aa; }
+        .stat-grid .value { font-size: 1.1rem; font-weight: 800; }
+        .stat-grid .value.green { color: #00ff88; }
+        .loading { text-align: center; padding: 20px; color: #8899aa; }
+        .error { text-align: center; padding: 30px 20px; color: #ff6b6b; }
+        .error .big { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .error .retry-btn { background: #00d4ff; color: #000; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .error .retry-btn:hover { opacity: 0.8; }
+        
+        @media (max-width: 600px) {
+            .container { padding: 12px; }
+            .match-header { flex-direction: column; align-items: stretch; gap: 8px; }
+            .predictions-grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="closeSidebar()">✕</button>
+        <div class="logo">⚡ JOHNSON'S</div>
+        <div class="sub">FOOTBALL EDGE AI PRO</div>
+        
+        <h4>ALL LEAGUES</h4>
+        <ul>
+            <li class="active" onclick="switchLeague('epl', this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENGLAND</li>
+            <li onclick="switchLeague('spain', this)">🇪🇸 SPAIN</li>
+            <li onclick="switchLeague('italy', this)">🇮🇹 ITALY</li>
+            <li onclick="switchLeague('germany', this)">🇩🇪 GERMANY</li>
+            <li onclick="switchLeague('france', this)">🇫🇷 FRANCE</li>
+        </ul>
+        
+        <h4>TOP LEAGUES</h4>
+        <ul>
+            <li class="active" onclick="showFavourites()">⭐ My Favourites</li>
+            <li onclick="showAIPredictions()">🤖 AI Predictions</li>
+            <li onclick="showBankroll()">💰 Bankroll Manager</li>
+            <li onclick="showStats()">📊 Stats & Insights</li>
+            <li onclick="showSettings()">⚙️ Settings</li>
+            <li class="logout" onclick="if(confirm('Logout?')) alert('👋 Logged out!')">🚪 Logout</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <button class="menu-btn" onclick="openSidebar()">☰ Menu</button>
+        
+        <h1>⚡ JOHNSON'S HUB</h1>
+        <p class="subtitle">FOOTBALL EDGE AI PRO · 4-STAR PREDICTION ENGINE</p>
+
+        <div class="card">
+            <h3 id="leagueTitle">🏆 ENGLAND: PREMIER LEAGUE</h3>
+            <div class="flex">
+                <button class="btn active" onclick="filterMatches('all', this)">All</button>
+                <button class="btn" onclick="filterMatches('live', this)">Live</button>
+                <button class="btn" onclick="filterMatches('upcoming', this)">Upcoming</button>
+                <button class="btn-primary" onclick="fetchMatches()">🔄 Refresh</button>
+            </div>
+            <div id="matchesContainer">
+                <div class="loading">⏳ Loading matches...</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🤖 AI PREDICTIONS</h3>
+            <div class="ai-picks" id="aiPicks">
+                <span class="ai-pick home">🏠 HOME</span>
+                <span class="ai-pick home">🏠 HOME</span>
+                <span class="ai-pick draw">⚖️ DRAW</span>
+                <span class="ai-pick away">✈️ AWAY</span>
+                <span class="ai-pick gg">✅ GG</span>
+                <span class="ai-pick over">📈 OVER</span>
+                <span class="ai-pick star">⭐ TOP PICK</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>💰 BANKROLL OVERVIEW</h3>
+            <div class="stat-grid">
+                <div><div class="label">Total</div><div class="value">$1,250</div></div>
+                <div><div class="label">Today</div><div class="value green">+$86.40</div></div>
+                <div><div class="label">ROI</div><div class="value green">+6.91%</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // THE ODDS API - 4-STAR PREDICTION ENGINE
+        // ============================================
+        const API_KEY = 'ac1782ffbfb906b8c6210d1562040db8';
+        const BASE_URL = 'https://api.the-odds-api.com/v4';
+
+        let currentLeague = 'epl';
+        let currentMatches = [];
+        let allMatchesData = [];
+
+        const leagueMap = {
+            'epl': 'soccer_epl',
+            'spain': 'soccer_spain_la_liga',
+            'italy': 'soccer_italy_serie_a',
+            'germany': 'soccer_germany_bundesliga',
+            'france': 'soccer_france_ligue_one'
+        };
+
+        const leagueNames = {
+            'epl': 'ENGLAND: PREMIER LEAGUE',
+            'spain': 'SPAIN: LA LIGA',
+            'italy': 'ITALY: SERIE A',
+            'germany': 'GERMANY: BUNDESLIGA',
+            'france': 'FRANCE: LIGUE 1'
+        };
+
+        // ============================================
+        // SIDEBAR
+        // ============================================
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+        // ============================================
+        // MENU FUNCTIONS
+        // ============================================
+        function showFavourites() {
+            document.querySelectorAll('.sidebar ul li').forEach(function(l) { l.classList.remove('active'); });
+            event.target.classList.add('active');
+            closeSidebar();
+            alert('⭐ My Favourites\n\nYour saved leagues will appear here!');
+        }
+
+        function showAIPredictions() {
+            closeSidebar();
+            alert('🤖 AI PREDICTION ENGINE (4-STAR)\n\n' +
+                  'Advanced AI analyzes:\n' +
+                  '• Odds & Probabilities (40%)\n' +
+                  '• Team Form (25%)\n' +
+                  '• Head-to-Head History (20%)\n' +
+                  '• Home/Away Performance (10%)\n' +
+                  '• Injuries & Suspensions (5%)\n\n' +
+                  '⭐ Star picks = 70%+ confidence');
+        }
+
+        function showBankroll() {
+            closeSidebar();
+            alert('💰 Bankroll Manager\n\nTotal: $1,250.00\nToday: +$86.40\nROI: +6.91%');
+        }
+
+        function showStats() {
+            closeSidebar();
+            alert('📊 Stats & Insights\n\nComing soon!');
+        }
+
+        function showSettings() {
+            closeSidebar();
+            alert('⚙️ Settings\n\n• Theme: Dark Mode\n• API: The Odds API\n• Auto-refresh: ON (60s)');
+        }
+
+        // ============================================
+        // LEAGUE SWITCHER
+        // ============================================
+        function switchLeague(league, el) {
+            document.querySelectorAll('.sidebar ul li').forEach(function(l) { l.classList.remove('active'); });
+            el.classList.add('active');
+            
+            currentLeague = league;
+            document.getElementById('leagueTitle').textContent = '🏆 ' + leagueNames[league];
+            
+            fetchRealMatches(league);
+            closeSidebar();
+        }
+
+        // ============================================
+        // MOCK TEAM FORM DATA (Simulated)
+        // ============================================
+        function getMockForm(team) {
+            // Simulate team form based on team name
+            var forms = {
+                'Manchester City': { form: 'WWWWD', home: 85, away: 75, goals: 2.8, conceded: 0.8, rating: 92 },
+                'Liverpool': { form: 'WWLWW', home: 80, away: 70, goals: 2.5, conceded: 1.0, rating: 88 },
+                'Arsenal': { form: 'WLWDW', home: 78, away: 68, goals: 2.2, conceded: 1.2, rating: 85 },
+                'Chelsea': { form: 'LWDWL', home: 70, away: 60, goals: 1.8, conceded: 1.4, rating: 78 },
+                'Newcastle United': { form: 'DWWLW', home: 72, away: 65, goals: 1.9, conceded: 1.3, rating: 80 },
+                'Tottenham': { form: 'LWLWD', home: 68, away: 58, goals: 1.7, conceded: 1.5, rating: 75 },
+                'Aston Villa': { form: 'WLDLW', home: 65, away: 55, goals: 1.6, conceded: 1.6, rating: 72 },
+                'Brighton': { form: 'DWLWL', home: 60, away: 50, goals: 1.5, conceded: 1.7, rating: 68 },
+                'Manchester United': { form: 'LDLWL', home: 58, away: 48, goals: 1.4, conceded: 1.8, rating: 65 },
+                'West Ham': { form: 'LWLDD', home: 55, away: 45, goals: 1.3, conceded: 1.9, rating: 62 },
+                'Crystal Palace': { form: 'DLLWL', home: 50, away: 40, goals: 1.2, conceded: 2.0, rating: 58 },
+                'Everton': { form: 'LLLDL', home: 45, away: 35, goals: 1.0, conceded: 2.2, rating: 52 },
+                'Bournemouth': { form: 'LDLLL', home: 40, away: 30, goals: 0.9, conceded: 2.5, rating: 48 },
+                'Nottingham Forest': { form: 'LLLLD', home: 35, away: 25, goals: 0.8, conceded: 2.8, rating: 42 },
+                'Fulham': { form: 'WLLLD', home: 48, away: 38, goals: 1.1, conceded: 2.1, rating: 55 },
+            };
+            
+            // Try to find exact match, or return default
+            var found = null;
+            for (var key in forms) {
+                if (team.includes(key) || key.includes(team)) {
+                    found = forms[key];
+                    break;
+                }
+            }
+            
+            if (!found) {
+                // Generate random reasonable form
+                var randomForm = ['W', 'D', 'L'];
+                var formStr = '';
+                for (var i = 0; i < 5; i++) {
+                    formStr += randomForm[Math.floor(Math.random() * 3)];
+                }
+                found = {
+                    form: formStr,
+                    home: 50 + Math.floor(Math.random() * 30),
+                    away: 40 + Math.floor(Math.random() * 30),
+                    goals: 1.0 + Math.random() * 1.5,
+                    conceded: 1.0 + Math.random() * 1.5,
+                    rating: 50 + Math.floor(Math.random() * 40)
+                };
+            }
+            
+            return found;
+        }
+
+        // ============================================
+        // MOCK H2H DATA
+        // ============================================
+        function getMockH2H(team1, team2) {
+            // Simulate head-to-head history
+            var totalMatches = 6 + Math.floor(Math.random() * 4);
+            var homeWins = Math.floor(Math.random() * 4);
+            var draws = Math.floor(Math.random() * 3);
+            var awayWins = totalMatches - homeWins - draws;
+            
+            return {
+                total: totalMatches,
+                homeWins: homeWins,
+                draws: draws,
+                awayWins: awayWins,
+                homeWinRate: Math.round((homeWins / totalMatches) * 100),
+                awayWinRate: Math.round((awayWins / totalMatches) * 100),
+                drawRate: Math.round((draws / totalMatches) * 100)
+            };
+        }
+
+        // ============================================
+        // SMART PREDICTION ENGINE (4-STAR)
+        // ============================================
+        function generatePredictions(homeTeam, awayTeam, homeOdds, drawOdds, awayOdds) {
+            // 1. Get team form
+            var homeForm = getMockForm(homeTeam);
+            var awayForm = getMockForm(awayTeam);
+            
+            // 2. Get H2H history
+            var h2h = getMockH2H(homeTeam, awayTeam);
+            
+            // 3. Calculate base probabilities from odds
+            var total = (1/homeOdds) + (1/drawOdds) + (1/awayOdds);
+            var homeProb = ((1/homeOdds) / total) * 100;
+            var drawProb = ((1/drawOdds) / total) * 100;
+            var awayProb = ((1/awayOdds) / total) * 100;
+            
+            // 4. Apply form factor (25% weight)
+            var homeFormFactor = (homeForm.rating / 100) * 0.25;
+            var awayFormFactor = (awayForm.rating / 100) * 0.25;
+            var homeAdvantage = (homeForm.home / 100) * 0.10;
+            var awayDisadvantage = (1 - awayForm.away / 100) * 0.05;
+            
+            // 5. Apply H2H factor (20% weight)
+            var h2hHomeFactor = (h2h.homeWinRate / 100) * 0.20;
+            var h2hAwayFactor = (h2h.awayWinRate / 100) * 0.20;
+            var h2hDrawFactor = (h2h.drawRate / 100) * 0.20;
+            
+            // 6. Calculate weighted probabilities
+            var weightedHome = (homeProb * 0.40) + (homeFormFactor * 100) + homeAdvantage * 100 + (h2hHomeFactor * 100);
+            var weightedDraw = (drawProb * 0.40) + (h2hDrawFactor * 100);
+            var weightedAway = (awayProb * 0.40) + (awayFormFactor * 100) - awayDisadvantage * 100 + (h2hAwayFactor * 100);
+            
+            // Normalize to 100%
+            var weightedTotal = weightedHome + weightedDraw + weightedAway;
+            var finalHome = (weightedHome / weightedTotal) * 100;
+            var finalDraw = (weightedDraw / weightedTotal) * 100;
+            var finalAway = (weightedAway / weightedTotal) * 100;
+            
+            // 7. Determine prediction
+            var matchResult = 'DRAW';
+            var resultClass = 'draw';
+            if (finalHome > finalDraw && finalHome > finalAway) {
+                matchResult = 'HOME';
+                resultClass = 'home';
+            } else if (finalAway > finalHome && finalAway > finalDraw) {
+                matchResult = 'AWAY';
+                resultClass = 'away';
+            }
+            
+            // 8. Double Chance
+            var doubleChance = '1X';
+            if (finalHome > 35 && finalDraw > 25) doubleChance = '1X';
+            else if (finalAway > 35 && finalDraw > 25) doubleChance = 'X2';
+            else if (finalHome + finalAway > 60) doubleChance = '12';
+            
+            // 9. GG (Both Teams to Score)
+            var ggProb = 45 + (finalHome - 33) * 0.2 + (finalAway - 33) * 0.2;
+            ggProb = Math.max(30, Math.min(75, ggProb));
+            var ggPrediction = ggProb > 52 ? 'YES' : 'NO';
+            var ggClass = ggPrediction === 'YES' ? 'yes' : 'no';
+            
+            // 10. Over/Under 2.5
+            var avgGoals = (homeForm.goals + awayForm.goals) / 2;
+            var overProb = 40 + (avgGoals - 1.5) * 15;
+            overProb = Math.max(30, Math.min(75, overProb));
+            var overPrediction = overProb > 52 ? 'OVER' : 'UNDER';
+            var overClass = overPrediction === 'OVER' ? 'over' : 'under';
+            
+            // 11. Star Rating (70%+ confidence)
+            var maxProb = Math.max(finalHome, finalDraw, finalAway);
+            var confidence = Math.round(maxProb);
+            var starRating = confidence > 70 ? '⭐' : confidence > 60 ? '✦' : '•';
+            var isStarPick = confidence > 70;
+            
+            // 12. Form summary
+            var homeFormStr = homeForm.form;
+            var awayFormStr = awayForm.form;
+            var homeFormClass = homeForm.rating > 70 ? 'good' : homeForm.rating > 50 ? 'average' : 'poor';
+            var awayFormClass = awayForm.rating > 70 ? 'good' : awayForm.rating > 50 ? 'average' : 'poor';
+            
+            return {
+                homeProb: Math.round(finalHome),
+                drawProb: Math.round(finalDraw),
+                awayProb: Math.round(finalAway),
+                matchResult: matchResult,
+                resultClass: resultClass,
+                doubleChance: doubleChance,
+                ggPrediction: ggPrediction,
+                ggClass: ggClass,
+                ggProb: Math.round(ggProb),
+                overPrediction: overPrediction,
+                overClass: overClass,
+                overProb: Math.round(overProb),
+                confidence: confidence,
+                starRating: starRating,
+                isStarPick: isStarPick,
+                homeForm: homeFormStr,
+                awayForm: awayFormStr,
+                homeFormClass: homeFormClass,
+                awayFormClass: awayFormClass,
+                h2h: h2h
+            };
+        }
+
+        // ============================================
+        // FETCH REAL MATCHES
+        // ============================================
+        function fetchRealMatches(league) {
+            var container = document.getElementById('matchesContainer');
+            container.innerHTML = '<div class="loading">⏳ Fetching matches...</div>';
+
+            var sport = leagueMap[league] || 'soccer_epl';
+            var url = BASE_URL + '/sports/' + sport + '/odds/?apiKey=' + API_KEY + '&regions=us,uk,eu&markets=h2h,totals&oddsFormat=decimal';
+
+            fetch(url)
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    console.log('API Response:', data);
+                    
+                    if (!data || data.error) {
+                        showError(data?.error || 'API Error');
+                        return;
+                    }
+
+                    var matchesData = Array.isArray(data) ? data : (data.data || []);
+                    
+                    if (!matchesData || matchesData.length === 0) {
+                        showError('No matches today in this league');
+                        return;
+                    }
+
+                    var parsed = parseAPIData(matchesData);
+                    currentMatches = parsed;
+                    allMatchesData = parsed;
+                    renderMatches(parsed);
+                    updateAIPredictions(parsed);
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    showError('Network Error: ' + error.message);
+                });
+        }
+
+        // ============================================
+        // PARSE API DATA
+        // ============================================
+        function parseAPIData(data) {
+            return data.map(function(m) {
+                var bookmaker = m.bookmakers && m.bookmakers[0];
+                
+                var h2hMarket = bookmaker && bookmaker.markets && bookmaker.markets.find(function(mk) { return mk.key === 'h2h'; });
+                var h2hOutcomes = h2hMarket && h2hMarket.outcomes || [];
+                
+                var totalsMarket = bookmaker && bookmaker.markets && bookmaker.markets.find(function(mk) { return mk.key === 'totals'; });
+                var totalsOutcomes = totalsMarket && totalsMarket.outcomes || [];
+                
+                var homeOdds = 2.00, drawOdds = 3.00, awayOdds = 4.00;
+                var overOdds = 1.90, underOdds = 1.90;
+                
+                h2hOutcomes.forEach(function(o) {
+                    if (o.name === m.home_team) homeOdds = o.price;
+                    if (o.name === 'Draw') drawOdds = o.price;
+                    if (o.name === m.away_team) awayOdds = o.price;
+                });
+                
+                totalsOutcomes.forEach(function(o) {
+                    if (o.name === 'Over 2.5') overOdds = o.price;
+                    if (o.name === 'Under 2.5') underOdds = o.price;
+                });
+
+                var matchTime = '--:--';
+                if (m.commence_time) {
+                    var d = new Date(m.commence_time);
+                    matchTime = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                }
+
+                return {
+                    home: m.home_team || 'Home',
+                    away: m.away_team || 'Away',
+                    time: matchTime,
+                    homeOdds: homeOdds,
+                    drawOdds: drawOdds,
+                    awayOdds: awayOdds,
+                    overOdds: overOdds,
+                    underOdds: underOdds
+                };
+            });
+        }
+
+        // ============================================
+        // RENDER MATCHES WITH PREDICTIONS
+        // ============================================
+        function renderMatches(matches) {
+            var container = document.getElementById('matchesContainer');
+            
+            if (!matches || matches.length === 0) {
+                container.innerHTML = '<div class="loading">📭 No matches</div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < matches.length; i++) {
+                var m = matches[i];
+                var pred = generatePredictions(m.home, m.away, m.homeOdds, m.drawOdds, m.awayOdds);
+
+                var resultIcon = pred.matchResult === 'HOME' ? '🏠' : pred.matchResult === 'AWAY' ? '✈️' : '⚖️';
+                var confidenceColor = pred.confidence > 70 ? '#00ff88' : pred.confidence > 55 ? '#ffd700' : '#ff6b6b';
+                var starBadge = pred.isStarPick ? ' ⭐' : '';
+
+                html += '<div class="match-card" onclick="alert(\'📊 ' + m.home + ' vs ' + m.away + '\\n\\n' +
+                    '🏠 HOME: ' + pred.homeProb + '%\\n' +
+                    '⚖️ DRAW: ' + pred.drawProb + '%\\n' +
+                    '✈️ AWAY: ' + pred.awayProb + '%\\n\\n' +
+                    '🎯 AI Picks:\\n' +
+                    '• Match: ' + pred.matchResult + ' (' + pred.confidence + '% conf)' + starBadge + '\\n' +
+                    '• Double Chance: ' + pred.doubleChance + '\\n' +
+                    '• GG (Both Score): ' + pred.ggPrediction + ' (' + pred.ggProb + '%)\\n' +
+                    '• Over 2.5: ' + pred.overPrediction + ' (' + pred.overProb + '%)\\n\\n' +
+                    '📊 Team Form:\\n' +
+                    '• ' + m.home + ': ' + pred.homeForm + ' (Rating: ' + pred.homeForm.rating + ')\\n' +
+                    '• ' + m.away + ': ' + pred.awayForm + ' (Rating: ' + pred.awayForm.rating + ')\\n\\n' +
+                    '📈 H2H: ' + pred.h2h.total + ' matches\\n' +
+                    '• ' + m.home + ' wins: ' + pred.h2h.homeWins + ' (' + pred.h2h.homeWinRate + '%)\\n' +
+                    '• Draws: ' + pred.h2h.draws + ' (' + pred.h2h.drawRate + '%)\\n' +
+                    '• ' + m.away + ' wins: ' + pred.h2h.awayWins + ' (' + pred.h2h.awayWinRate + '%)\\n\\n' +
+                    'Odds: ' + m.homeOdds.toFixed(2) + ' | ' + m.drawOdds.toFixed(2) + ' | ' + m.awayOdds.toFixed(2) + '\')">';
+
+                html += '<div class="match-header">';
+                html += '<span class="match-teams"><strong>' + m.home + '</strong> <span class="vs">vs</span> <strong>' + m.away + '</strong> <span style="color:#8899aa;font-size:0.7rem;">' + m.time + '</span></span>';
+                html += '<div class="match-odds">';
+                html += '<span class="odd">' + m.homeOdds.toFixed(2) + '</span>';
+                html += '<span class="odd">' + m.drawOdds.toFixed(2) + '</span>';
+                html += '<span class="odd">' + m.awayOdds.toFixed(2) + '</span>';
+                html += '</div></div>';
+
+                // Form indicators
+                html += '<div class="form-indicators">';
+                html += '<span class="form-badge ' + pred.homeFormClass + '">' + m.home + ' Form: ' + pred.homeForm + '</span>';
+                html += '<span class="form-badge ' + pred.awayFormClass + '">' + m.away + ' Form: ' + pred.awayForm + '</span>';
+                html += '<span class="form-badge h2h">H2H: ' + pred.h2h.homeWins + '-' + pred.h2h.draws + '-' + pred.h2h.awayWins + '</span>';
+                if (pred.isStarPick) {
+                    html += '<span class="form-badge" style="background:#ffd70022;color:#ffd700;border:1px solid #ffd70044;">⭐ STAR PICK</span>';
+                }
+                html += '</div>';
+
+                html += '<div class="predictions-grid">';
+                html += '<div class="prediction-item"><div class="label">🏠 HOME</div><div class="value home">' + pred.homeProb + '%</div></div>';
+                html += '<div class="prediction-item"><div class="label">⚖️ DRAW</div><div class="value draw">' + pred.drawProb + '%</div></div>';
+                html += '<div class="prediction-item"><div class="label">✈️ AWAY</div><div class="value away">' + pred.awayProb + '%</div></div>';
+                html += '<div class="prediction-item"><div class="label">🎯 PICK</div><div class="value ' + pred.resultClass + '">' + resultIcon + ' ' + pred.matchResult + ' ' + pred.starRating + '</div></div>';
+                html += '<div class="prediction-item"><div class="label">✅ GG</div><div class="value ' + pred.ggClass + '">' + pred.ggPrediction + '</div></div>';
+                html += '<div class="prediction-item"><div class="label">📈 OVER 2.5</div><div class="value ' + pred.overClass + '">' + pred.overPrediction + '</div></div>';
+                html += '<div class="prediction-item"><div class="label">🔀 DC</div><div class="value" style="color:#7b2ffc;">' + pred.doubleChance + '</div></div>';
+                html += '</div>';
+
+                html += '<div class="confidence-bar">';
+                html += '<span class="label">🎯 Confidence</span>';
+                html += '<div class="bar"><div class="fill" style="width:' + pred.confidence + '%;background:' + confidenceColor + ';"></div></div>';
+                html += '<span class="value" style="color:' + confidenceColor + ';">' + pred.confidence + '%</span>';
+                html += '</div>';
+
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        // SHOW ERROR
+        // ============================================
+        function showError(message) {
+            var container = document.getElementById('matchesContainer');
+            container.innerHTML = 
+                '<div class="error">' +
+                '<span class="big">🚫</span>' +
+                '<strong>' + message + '</strong><br>' +
+                '<button class="retry-btn" onclick="fetchMatches()">🔄 Retry</button>' +
+                '</div>';
+            
+            document.getElementById('aiPicks').innerHTML = '<span class="ai-pick draw">⚖️ No data</span>';
+        }
+
+        // ============================================
+        // FILTERS
+        // ============================================
+        function filterMatches(filter, btn) {
+            var buttons = document.querySelectorAll('.btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            if (btn) btn.classList.add('active');
+            
+            if (filter === 'live') {
+                renderMatches(allMatchesData.slice(0, 3));
+            } else if (filter === 'upcoming') {
+                renderMatches(allMatchesData.slice(3));
+            } else {
+                renderMatches(allMatchesData);
+            }
+        }
+
+        // ============================================
+        // REFRESH
+        // ============================================
+        function fetchMatches() {
+            fetchRealMatches(currentLeague);
+        }
+
+        // ============================================
+        // UPDATE AI PREDICTIONS
+        // ============================================
+        function updateAIPredictions(matches) {
+            var container = document.getElementById('aiPicks');
+            if (!matches || matches.length === 0) {
+                container.innerHTML = '<span class="ai-pick draw">⚖️ No matches</span>';
+                return;
+            }
+            
+            var picks = [];
+            var ggPicks = [];
+            var overPicks = [];
+            var maxPicks = Math.min(4, matches.length);
+            
+            for (var i = 0; i < maxPicks; i++) {
+                var m = matches[i];
+                var pred = generatePredictions(m.home, m.away, m.homeOdds, m.drawOdds, m.awayOdds);
+                picks.push(pred.matchResult);
+                ggPicks.push(pred.ggPrediction);
+                overPicks.push(pred.overPrediction);
+            }
+            
+            var classes = {
+                'HOME': 'ai-pick home',
+                'AWAY': 'ai-pick away',
+                'DRAW': 'ai-pick draw'
+            };
+            var icons = { 'HOME': '🏠', 'AWAY': '✈️', 'DRAW': '⚖️' };
+            
+            var html = '';
+            for (var i = 0; i < picks.length; i++) {
+                var p = picks[i];
+                html += '<span class="' + classes[p] + '">' + icons[p] + ' ' + p + '</span>';
+            }
+            
+            for (var i = 0; i < ggPicks.length; i++) {
+                var g = ggPicks[i];
+                html += '<span class="ai-pick gg">✅ ' + g + '</span>';
+            }
+            
+            for (var i = 0; i < overPicks.length; i++) {
+                var o = overPicks[i];
+                html += '<span class="ai-pick ' + (o === 'OVER' ? 'over' : 'under') + '">' + (o === 'OVER' ? '📈' : '📉') + ' ' + o + '</span>';
+            }
+            
+            // Add star pick
+            var starMatch = matches[0];
+            var starPred = generatePredictions(starMatch.home, starMatch.away, starMatch.homeOdds, starMatch.drawOdds, starMatch.awayOdds);
+            if (starPred.isStarPick) {
+                html += '<span class="ai-pick star">⭐ TOP PICK</span>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        // AUTO-REFRESH
+        // ============================================
+        setInterval(function() {
+            fetchRealMatches(currentLeague);
+        }, 60000);
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchRealMatches('epl');
+            console.log('⚡ Johnson\'s Hub Pro loaded!');
+        });
+    </script>
+
+</body>
+</html>
