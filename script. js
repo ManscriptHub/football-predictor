@@ -1,0 +1,104 @@
+// ============================================
+// JOHNSON'S HUB - FOOTBALL EDGE AI
+// ============================================
+
+// Date picker sync
+document.querySelector('.date-picker input').addEventListener('change', function() {
+  console.log('Date changed to:', this.value);
+});
+
+// Filter tabs
+document.querySelectorAll('.filter-tabs button').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-tabs button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    console.log('Filtering:', this.textContent.trim());
+  });
+});
+
+// Refresh button
+document.querySelector('.refresh-btn').addEventListener('click', function() {
+  this.textContent = '⏳ Loading...';
+  this.disabled = true;
+  
+  setTimeout(() => {
+    this.textContent = '🔄 Refresh';
+    this.disabled = false;
+    // Simulate data refresh
+    document.querySelectorAll('.match-row').forEach((row, i) => {
+      const edgeEl = row.querySelector('.best-edge');
+      const randomEdge = Math.floor(Math.random() * 40) + 5;
+      edgeEl.textContent = randomEdge + '%';
+      edgeEl.style.color = randomEdge > 25 ? '#ffd700' : '#8899aa';
+    });
+  }, 1000);
+});
+
+// League list click
+document.querySelectorAll('.league-list li:not(.more)').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.league-list li').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+    console.log('Selected league:', this.textContent.trim());
+  });
+});
+
+// Nav menu click
+document.querySelectorAll('.nav-menu li:not(.logout)').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-menu li').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+    console.log('Navigated to:', this.textContent.trim());
+  });
+});
+
+// Logout
+document.querySelector('.nav-menu li.logout')?.addEventListener('click', () => {
+  if (confirm('Are you sure you want to logout?')) {
+    console.log('Logging out...');
+  }
+});
+
+// Match row click - show details
+document.querySelectorAll('.match-row').forEach(row => {
+  row.addEventListener('click', function() {
+    const match = this.querySelector('.match-col')?.textContent?.trim() || 'Match';
+    alert(`📊 Match Details\n${match}\n\nClick OK to view full analysis`);
+  });
+});
+
+// AI Prediction pick hover effect
+document.querySelectorAll('.ai-picks .pick').forEach(pick => {
+  pick.addEventListener('mouseenter', function() {
+    this.style.transform = 'scale(1.05)';
+    this.style.transition = 'transform 0.2s';
+  });
+  pick.addEventListener('mouseleave', function() {
+    this.style.transform = 'scale(1)';
+  });
+});
+
+// Auto-refresh every 60 seconds
+setInterval(() => {
+  const refreshBtn = document.querySelector('.refresh-btn');
+  if (!refreshBtn.disabled) {
+    refreshBtn.click();
+  }
+}, 60000);
+
+// Simulate live updates
+setInterval(() => {
+  const oddsCells = document.querySelectorAll('.match-row span:not(.time):not(.match-col):not(.best-edge)');
+  oddsCells.forEach(cell => {
+    if (Math.random() > 0.7) {
+      const current = parseFloat(cell.textContent);
+      if (!isNaN(current)) {
+        const change = (Math.random() - 0.5) * 0.2;
+        cell.textContent = (current + change).toFixed(2);
+      }
+    }
+  });
+}, 30000);
+
+console.log('⚡ Johnson\'s Hub - Football Edge AI loaded!');
+console.log('📊 Data-driven predictions for smarter betting.');
